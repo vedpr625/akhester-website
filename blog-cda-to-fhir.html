@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapping CDA Documents to FHIR: Common Pitfalls & Solutions — Akhester Technologies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --ink:   #0F1C2E; --ink-2: #2C3E55; --ink-3: #56718F; --ink-4: #8FA8C4;
+        --ink-muted: #52759C;
+        --teal:  #0A7A6E; --teal-2:#0E9B8C;
+        --surface:#FFFFFF; --s2:#F8FAFD; --s3:#EFF3F9;
+        --rule:  #DDE5F0; --rule-s:#EBF0F8;
+        --dark:  #0D1B2A; --on-dark:rgba(255,255,255,.88); --on-dark2:rgba(255,255,255,.58);
+        --f-head:   'Plus Jakarta Sans', sans-serif; --f-body:'Inter',sans-serif; --w:1200px;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;}
+    body{font-family:var(--f-body);color:var(--ink);background:var(--surface);line-height:1.6;overflow-x:hidden;}
+
+    
+    /* ── LOGO IMAGE ── */
+    .logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+    .logo-img {
+        height: 58px;
+        width: auto;
+        max-width: 200px;
+        display: block;
+        object-fit: contain;
+        /* No filter — logo has blue colours that show on white nav */
+    }
+
+    /* NAV */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--rule-s);transition:box-shadow .3s;}
+    .nav.solid{box-shadow:0 1px 20px rgba(15,28,46,.06);}
+    .nav-inner{max-width:var(--w);margin:0 auto;padding:0 48px;height:68px;display:flex;align-items:center;gap:40px;}
+    .nav-sep{width:1px;height:20px;background:var(--rule);flex-shrink:0;}
+    .nav-links{display:flex;align-items:center;gap:2px;list-style:none;flex:1;}
+    .nav-links a{font-size:14px;font-weight:500;color:var(--ink-3);text-decoration:none;padding:6px 14px;border-radius:5px;transition:color .15s,background .15s;}
+    .nav-links a:hover{color:var(--ink);background:var(--s3);}
+    .nav-links a.cur{color:var(--ink);font-weight:600;}
+    .nav-btn{background:var(--ink);color:white;font-family:var(--f-body);font-size:13.5px;font-weight:600;padding:9px 20px;border-radius:6px;text-decoration:none;transition:background .2s;flex-shrink:0;}
+    .nav-btn:hover{background:var(--teal);}
+    .nav-mob{display:none;background:none;border:none;cursor:pointer;padding:6px;}
+
+    /* DRAWER */
+    .drawer{display:none;position:fixed;inset:0;background:white;z-index:99;flex-direction:column;padding:80px 32px 40px;}
+    .drawer.open{display:flex;}
+    .drawer a{font-size:17px;font-weight:500;color:var(--ink-2);text-decoration:none;padding:15px 0;border-bottom:1px solid var(--rule-s);transition:color .15s;}
+    .drawer a:hover{color:var(--teal);}
+    .drawer-cta{margin-top:24px;background:var(--ink)!important;color:white!important;text-align:center;border-radius:6px;font-weight:600!important;}
+
+    /* ARTICLE LAYOUT */
+    .wrap{max-width:var(--w);margin:0 auto;padding:0 48px;}
+    .article-wrap{max-width:720px;margin:0 auto;padding:0 48px;}
+
+    /* Breadcrumb */
+    .breadcrumb{
+        max-width:var(--w);margin:0 auto;padding:100px 48px 0;
+        display:flex;align-items:center;gap:8px;
+        font-size:12.5px;color:var(--ink-4);
+    }
+    .breadcrumb a{color:var(--ink-3);text-decoration:none;transition:color .15s;}
+    .breadcrumb a:hover{color:var(--teal);}
+    .breadcrumb-sep{color:var(--rule);}
+
+    /* Article header */
+    .art-header{max-width:var(--w);margin:0 auto;padding:28px 48px 56px;}
+    .art-cat{
+        display:inline-flex;align-items:center;gap:8px;
+        font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+        color:var(--teal);margin-bottom:18px;
+    }
+    .art-cat::before{content:'';display:block;width:18px;height:2px;background:var(--teal);}
+    .art-header h1{
+        font-family:var(--f-head);font-size:40px;font-weight:800;
+        letter-spacing:-1.2px;line-height:1.15;color:var(--ink);
+        margin-bottom:22px;max-width:720px;
+    }
+    .art-meta-row{
+        display:flex;align-items:center;gap:16px;
+        font-size:13px;color:var(--ink-4);
+        padding-top:20px;border-top:1px solid var(--rule-s);
+    }
+    .art-meta-dot{width:3px;height:3px;border-radius:50%;background:var(--rule);flex-shrink:0;}
+    .art-author{font-weight:600;color:var(--ink-2);}
+
+    /* Article body */
+    .art-body{
+        max-width:720px;margin:0 auto;padding:0 48px 96px;
+        font-size:17px;line-height:1.85;color:var(--ink-2);
+    }
+    .art-body h2{
+        font-family:var(--f-head);font-size:24px;font-weight:700;
+        letter-spacing:-.4px;color:var(--ink);
+        margin:52px 0 18px;padding-top:0;
+    }
+    .art-body h3{
+        font-family:var(--f-head);font-size:19px;font-weight:700;
+        letter-spacing:-.3px;color:var(--ink);
+        margin:36px 0 14px;
+    }
+    .art-body p{margin-bottom:22px;}
+    .art-body ul,.art-body ol{padding-left:24px;margin-bottom:22px;}
+    .art-body li{margin-bottom:8px;line-height:1.75;}
+    .art-body strong{font-weight:600;color:var(--ink);}
+    .art-body a{color:var(--teal);text-decoration:underline;text-underline-offset:3px;}
+    .art-body a:hover{color:#077068;}
+
+    /* Code block */
+    .art-body pre{
+        background:var(--dark);color:rgba(255,255,255,.90);
+        border-radius:8px;padding:24px 28px;
+        font-family:'Fira Code','Courier New',monospace;font-size:13.5px;
+        line-height:1.7;overflow-x:auto;margin:28px 0;
+        border:1px solid rgba(255,255,255,.06);
+    }
+    .art-body code{
+        font-family:'Fira Code','Courier New',monospace;font-size:13px;
+        background:var(--s2);color:var(--teal);
+        padding:2px 6px;border-radius:4px;border:1px solid var(--rule-s);
+    }
+    .art-body pre code{background:none;color:inherit;padding:0;border:none;font-size:inherit;}
+
+    /* Callout box */
+    .callout{
+        background:var(--s2);border-left:3px solid var(--teal);
+        border-radius:0 6px 6px 0;padding:18px 22px;
+        margin:28px 0;font-size:15px;color:var(--ink-2);
+    }
+    .callout strong{color:var(--teal);}
+
+    /* Divider */
+    .art-divider{border:none;border-top:1px solid var(--rule-s);margin:48px 0;}
+
+    /* Related articles */
+    .related{
+        background:var(--s2);border-top:1px solid var(--rule-s);
+        padding:56px 0;
+    }
+    .related-inner{max-width:var(--w);margin:0 auto;padding:0 48px;}
+    .related-label{
+        font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+        color:var(--ink-4);margin-bottom:28px;display:flex;align-items:center;gap:12px;
+    }
+    .related-label::after{content:'';flex:1;height:1px;background:var(--rule-s);}
+    .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden;}
+    .rel-card{background:white;padding:26px 24px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:8px;transition:background .15s;border-left:3px solid transparent;}
+    .rel-card:hover{background:var(--s2);border-left-color:var(--teal);}
+    .rel-cat{font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--teal);}
+    .rel-card h4{font-family:var(--f-head);font-size:14px;font-weight:700;letter-spacing:-.2px;line-height:1.4;color:var(--ink);}
+    .rel-meta{font-size:12.5px;color:var(--ink-muted);}
+    .rel-arrow{font-size:12px;color:var(--teal);font-weight:600;margin-top:4px;}
+
+    /* Footer */
+    .footer-wordmark {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 18px;
+    }
+    .fw-brand {
+        font-family: var(--f-head);
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: white;
+        line-height: 1;
+    }
+    .fw-brand span {
+        color: var(--teal-2);
+    }
+    .fw-sub {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.45);
+    }
+        footer{background:var(--dark);padding:32px 0;border-top:1px solid rgba(255,255,255,.06);}
+    .footer-bar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--on-dark2);flex-wrap:wrap;gap:10px;}
+    .footer-links{display:flex;gap:24px;}
+    .footer-links a{color:rgba(255,255,255,.75);text-decoration:none;transition:color .2s;}
+    .footer-links a:hover{color:var(--teal-2);}
+
+    @media(max-width:768px){
+        .nav-links,.nav-btn,.nav-sep{display:none;}
+        .nav-mob{display:flex;align-items:center;justify-content:center;}
+        .nav-inner{padding:0 24px;height:62px;}
+        .breadcrumb,.art-header{padding-left:24px;padding-right:24px;}
+        .breadcrumb{padding-top:84px;}
+        .art-header h1{font-size:28px;}
+        .art-body{padding-left:24px;padding-right:24px;}
+        .related-inner{padding:0 24px;}
+        .related-grid{grid-template-columns:1fr;}
+        .wrap{padding:0 24px;}
+    }
+</style>
+</head>
+<body>
+
+<div class="drawer" id="drawer">
+    <a href="index.html" onclick="closeDrawer()">Home</a>
+    <a href="index.html#services" onclick="closeDrawer()">Services</a>
+    <a href="index.html#fhir" onclick="closeDrawer()">FHIR Platform</a>
+    <a href="index.html#about" onclick="closeDrawer()">About</a>
+    <a href="blog.html" onclick="closeDrawer()">Blog</a>
+    <a href="index.html#contact" class="drawer-cta" onclick="closeDrawer()">Get in Touch</a>
+</div>
+<nav class="nav" id="nav">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">
+            <img src="images/akhester_logo.png" alt="Akhester Technologies" class="logo-img">
+        </a>
+        <div class="nav-sep"></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#services">Services</a></li>
+            <li><a href="index.html#fhir">FHIR Platform</a></li>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="blog.html" class="cur">Blog</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+        <a href="index.html#contact" class="nav-btn">Get in Touch</a>
+        <button class="nav-mob" onclick="toggleDrawer()" aria-label="Menu">
+            <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+                <rect y="0" width="22" height="2" rx="1" fill="#0F1C2E"/>
+                <rect y="7" width="16" height="2" rx="1" fill="#0F1C2E"/>
+                <rect y="14" width="22" height="2" rx="1" fill="#0F1C2E"/>
+            </svg>
+        </button>
+    </div>
+</nav>
+
+
+<div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="breadcrumb-sep">/</span>
+    <a href="blog.html">Blog</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>EHR Integration</span>
+</div>
+
+<div class="art-header">
+    <div class="art-cat">EHR Integration</div>
+    <h1>Mapping CDA Documents to FHIR: Common Pitfalls & Solutions</h1>
+    <div class="art-meta-row">
+        <span class="art-author">Akhester Engineering</span>
+        <span class="art-meta-dot"></span>
+        <span>Nov 2024</span>
+        <span class="art-meta-dot"></span>
+        <span>6 min read</span>
+    </div>
+</div>
+
+<div class="art-body">
+
+<h2>Why CDA to FHIR Conversion?</h2>
+<p>C-CDA (Consolidated Clinical Document Architecture) is still the dominant format for clinical document exchange in the US — discharge summaries, referral notes, and continuity of care documents all arrive as CDA XML. Converting them to FHIR resources allows you to store, query, and exchange that data through modern APIs.</p>
+<div class="callout"><strong>Reference implementation:</strong> The HL7 CDA-to-FHIR mapping guide and the open-source <code>ccda-to-fhir</code> library provide a starting point, but production use requires significant customisation.</div>
+
+<h2>The Core Mapping Challenge</h2>
+<p>CDA is a document-centric model. FHIR is resource-centric. A single CDA document maps to a <code>Bundle</code> containing a <code>Composition</code> (the document shell), a <code>Patient</code>, and multiple clinical resources extracted from each CDA section.</p>
+
+<h2>Pitfall 1: Code System Mismatches</h2>
+<p>CDA uses SNOMED CT, LOINC, RxNorm, and ICD codes — but often with local extensions or retired codes. Always validate extracted codes against current terminology servers before storing them in FHIR resources. A code that was valid in 2015 ICD-9 will not be a valid FHIR <code>Coding</code> today.</p>
+<pre><code>// Validate against a FHIR terminology server
+GET /fhir/CodeSystem/$validate-code
+  ?url=http://hl7.org/fhir/sid/icd-10-cm
+  &amp;code=J18.9
+  &amp;display=Pneumonia%2C+unspecified+organism</code></pre>
+
+<h2>Pitfall 2: Nulls and Missing Required Fields</h2>
+<p>CDA sections often contain <code>nullFlavor</code> attributes instead of actual values. Map these to FHIR's <code>_value</code> data absent extensions — do not silently drop them. A missing birth date in FHIR is better represented with a data absent reason than omitted entirely.</p>
+
+<h2>Pitfall 3: Author and Performer Identity</h2>
+<p>CDA contains author and performer sections with NPI numbers and organisation details. Map these to FHIR <code>Practitioner</code> and <code>Organization</code> resources and use references, not inline repetition. Deduplication by NPI is essential — the same clinician appears in every document they authored.</p>
+
+<h2>Handling Narrative Text</h2>
+<p>CDA sections contain human-readable narrative in <code>&lt;text&gt;</code> elements. Preserve this in the FHIR <code>Composition.section.text</code> field. Do not attempt to parse narrative text into structured FHIR fields — this introduces hallucination errors that corrupt clinical data.</p>
+
+<h2>Testing Your Mappings</h2>
+<p>Run converted bundles through the HAPI FHIR validator against US Core profiles. Track mapping accuracy with a set of known reference documents where you can manually verify output. Aim for zero validation errors on the Patient, Condition, and MedicationRequest resources before deploying to production.</p>
+
+<hr class="art-divider">
+<p style="font-size:14px;color:var(--ink-4);">Have questions about implementing this in your healthcare platform? <a href="index.html#contact">Get in touch with the Akhester team.</a></p>
+</div>
+
+
+<section class="related">
+    <div class="related-inner">
+        <div class="related-label">More Articles</div>
+        <div class="related-grid">
+        <a href="blog-fhir-r4-guide.html" class="rel-card">
+            <div class="rel-cat">FHIR</div>
+            <h4>Getting Started with FHIR R4</h4>
+            <div class="rel-meta">May 2025 · 8 min</div>
+            <div class="rel-arrow">Read Article →</div>
+        </a>
+        <a href="blog-smart-epic.html" class="rel-card">
+            <div class="rel-cat">EHR Integration</div>
+            <h4>Smart on FHIR App Launch: Sandbox to Epic</h4>
+            <div class="rel-meta">April 2025 · 6 min</div>
+            <div class="rel-arrow">Read Article →</div>
+        </a>
+        <a href="blog-hipaa-aws.html" class="rel-card">
+            <div class="rel-cat">Cloud & DevOps</div>
+            <h4>HIPAA-Compliant FHIR on AWS</h4>
+            <div class="rel-meta">March 2025 · 7 min</div>
+            <div class="rel-arrow">Read Article →</div>
+        </a>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="wrap">
+        <div class="footer-bar">
+            <span>© 2025 Akhester Technologies LLP · Gurugram, India</span>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="blog.html">Blog</a>
+                <a href="https://ajfhir.org/" target="_blank">AJFHIR.org</a>
+                <a href="https://ajfhir.com/" target="_blank">AJFHIR.com</a>
+            </div>
+        </div>
+    </div>
+</footer>
+<script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 40), {passive:true});
+    function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');}
+    function closeDrawer(){document.getElementById('drawer').classList.remove('open');}
+</script>
+
+</body>
+</html>

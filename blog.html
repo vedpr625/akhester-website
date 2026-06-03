@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — Akhester Technologies | FHIR & Healthcare Interoperability</title>
+    <meta name="description" content="In-depth engineering articles on HL7 FHIR, Smart on FHIR, EHR integration, and healthcare interoperability from the Akhester team.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --ink:      #0F1C2E;
+        --ink-2:    #2C3E55;
+        --ink-3:    #56718F;
+        --ink-4:    #8FA8C4;
+        --ink-muted: #52759C;
+        --teal:     #0A7A6E;
+        --teal-2:   #0E9B8C;
+        --surface:  #FFFFFF;
+        --s2:       #F8FAFD;
+        --s3:       #EFF3F9;
+        --rule:     #DDE5F0;
+        --rule-s:   #EBF0F8;
+        --dark:     #0D1B2A;
+        --on-dark:  rgba(255,255,255,.88);
+        --on-dark2: rgba(255,255,255,.58);
+        --f-head:   'Plus Jakarta Sans', sans-serif;
+        --f-body:   'Inter', sans-serif;
+        --w:        1200px;
+    }
+    *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+    body { font-family:var(--f-body); color:var(--ink); background:var(--surface); line-height:1.6; overflow-x:hidden; }
+
+    
+    /* ── LOGO IMAGE ── */
+    .logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+    .logo-img {
+        height: 58px;
+        width: auto;
+        max-width: 200px;
+        display: block;
+        object-fit: contain;
+        /* No filter — logo has blue colours that show on white nav */
+    }
+
+    /* NAV */
+    .nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(255,255,255,.97); backdrop-filter:blur(12px); border-bottom:1px solid var(--rule-s); transition:box-shadow .3s; }
+    .nav.solid { box-shadow:0 1px 20px rgba(15,28,46,.06); }
+    .nav-inner { max-width:var(--w); margin:0 auto; padding:0 48px; height:68px; display:flex; align-items:center; gap:40px; }
+    .nav-sep { width:1px; height:20px; background:var(--rule); flex-shrink:0; }
+    .nav-links { display:flex; align-items:center; gap:2px; list-style:none; flex:1; }
+    .nav-links a { font-size:13.5px; font-weight:500; color:var(--ink-3); text-decoration:none; padding:6px 14px; border-radius:5px; transition:color .15s,background .15s; }
+    .nav-links a:hover { color:var(--ink); background:var(--s3); }
+    .nav-links a.cur { color:var(--ink); font-weight:600; }
+    .nav-btn { background:var(--ink); color:white; font-family:var(--f-body); font-size:13.5px; font-weight:600; padding:9px 20px; border-radius:6px; text-decoration:none; transition:background .2s; flex-shrink:0; }
+    .nav-btn:hover { background:var(--teal); }
+    .nav-mob { display:none; background:none; border:none; cursor:pointer; padding:6px; }
+
+    /* DRAWER */
+    .drawer { display:none; position:fixed; inset:0; background:white; z-index:99; flex-direction:column; padding:80px 32px 40px; }
+    .drawer.open { display:flex; }
+    .drawer a { font-size:17px; font-weight:500; color:var(--ink-2); text-decoration:none; padding:15px 0; border-bottom:1px solid var(--rule-s); transition:color .15s; }
+    .drawer a:hover { color:var(--teal); }
+    .drawer-cta { margin-top:24px; background:var(--ink) !important; color:white !important; text-align:center; border-radius:6px; font-weight:600 !important; }
+
+    /* UTILS */
+    .wrap { max-width:var(--w); margin:0 auto; padding:0 48px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:11.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--teal); }
+    .eyebrow::before { content:''; display:block; width:18px; height:2px; background:var(--teal); }
+
+    /* PAGE HEADER */
+    .ph {
+        padding:120px 0 56px;
+        background:white;
+        border-bottom:1px solid var(--rule-s);
+        position:relative; overflow:hidden;
+    }
+    .ph::before {
+        content:''; position:absolute; top:0; right:0;
+        width:45%; height:100%;
+        background-image:radial-gradient(circle,#C8D8EC 1px,transparent 1px);
+        background-size:28px 28px;
+        mask-image:linear-gradient(to left,rgba(0,0,0,.10) 0%,transparent 75%);
+        pointer-events:none;
+    }
+    .ph::after { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:linear-gradient(to bottom,var(--teal),transparent); }
+    .ph-inner { position:relative; z-index:1; }
+    .ph-inner h1 { font-family:var(--f-head); font-size:42px; font-weight:800; letter-spacing:-0.8px; line-height:1.12; color:var(--ink); margin:14px 0 14px; }
+    .ph-inner > p { font-size:16px; color:var(--ink-3); max-width:500px; line-height:1.75; }
+
+    /* FILTER */
+    .filter-wrap { background:white; border-bottom:1px solid var(--rule-s); position:sticky; top:68px; z-index:90; }
+    .filter-inner { max-width:var(--w); margin:0 auto; padding:0 48px; height:52px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+    .filter-tabs { display:flex; overflow-x:auto; scrollbar-width:none; }
+    .filter-tabs::-webkit-scrollbar { display:none; }
+    .ftab { font-family:var(--f-body); font-size:13px; font-weight:500; color:var(--ink-3); background:none; border:none; cursor:pointer; padding:4px 16px; white-space:nowrap; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .15s,border-color .15s; }
+    .ftab:hover { color:var(--ink); }
+    .ftab.on { color:var(--ink); font-weight:600; border-color:var(--teal); }
+    .f-count { font-size:13px; color:var(--ink-muted); white-space:nowrap; flex-shrink:0; }
+
+    /* ARTICLE LIST — editorial rows, no cards */
+    .articles { padding:0 0 80px; }
+
+    /* Category header row */
+    .cat-header {
+        display:flex; align-items:center; gap:12px;
+        padding:40px 0 20px;
+        border-bottom:1px solid var(--rule-s);
+        margin-bottom:0;
+    }
+    .cat-header-label { font-family:var(--f-head); font-size:13px; font-weight:700; letter-spacing:.5px; color:var(--ink-4); text-transform:uppercase; }
+    .cat-header-rule { flex:1; height:1px; background:var(--rule-s); }
+
+    /* Article row */
+    .art-row {
+        display:grid; grid-template-columns:64px 1fr auto;
+        gap:0; align-items:start;
+        padding:28px 0;
+        border-bottom:1px solid var(--rule-s);
+        text-decoration:none; color:inherit;
+        transition:background .15s;
+        position:relative;
+    }
+    .art-row::before {
+        content:''; position:absolute; left:-48px; top:0; bottom:0; width:3px;
+        background:var(--teal); opacity:0; transition:opacity .2s;
+    }
+    .art-row:hover { background:var(--s2); }
+    .art-row:hover::before { opacity:1; }
+
+    .art-num {
+        font-family:var(--f-head); font-size:12px; font-weight:700;
+        color:var(--ink-4); letter-spacing:.5px; padding-top:3px;
+    }
+    .art-main { padding:0 24px 0 0; }
+    .art-row-meta { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .art-row-cat {
+        font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+        color:white; padding:3px 8px; border-radius:3px;
+    }
+    .cat-fhir       { background:#0A7A6E; }
+    .cat-ehr        { background:#1A3D6E; }
+    .cat-cloud      { background:#0F5F82; }
+    .cat-compliance { background:#5B21B6; }
+    .cat-oss        { background:#065F46; }
+
+    .art-row-date { font-size:12.5px; color:var(--ink-muted); }
+    .art-row-read { font-size:12.5px; color:var(--ink-muted); }
+    .art-row-dot  { width:3px; height:3px; border-radius:50%; background:var(--ink-muted); flex-shrink:0; }
+    .art-row h3 { font-family:var(--f-head); font-size:17px; font-weight:700; letter-spacing:-.3px; line-height:1.35; color:var(--ink); margin-bottom:7px; }
+    .art-row p  { font-size:13.5px; color:var(--ink-3); line-height:1.7; max-width:640px; }
+    .art-row-arrow {
+        width:36px; height:36px; border:1px solid var(--rule);
+        border-radius:6px; display:flex; align-items:center; justify-content:center;
+        color:var(--ink-3); flex-shrink:0; margin-top:2px;
+        transition:background .15s, border-color .15s, color .15s;
+    }
+    .art-row:hover .art-row-arrow { background:var(--teal); border-color:var(--teal); color:white; }
+
+    /* NEWSLETTER */
+    .nl { padding:0 0 80px; }
+    .nl-box {
+        background:var(--dark); border-radius:8px; padding:52px 56px;
+        display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;
+    }
+    .nl-h { font-family:var(--f-head); font-size:24px; font-weight:700; letter-spacing:-.3px; color:white; margin-bottom:10px; }
+    .nl-p { font-size:14px; color:var(--on-dark); line-height:1.75; }
+    .nl-form { display:flex; gap:10px; }
+    .nl-form input { flex:1; padding:11px 14px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); border-radius:6px; font-family:var(--f-body); font-size:14px; color:white; transition:border-color .2s; }
+    .nl-form input::placeholder { color:rgba(255,255,255,.35); }
+    .nl-form input:focus { outline:none; border-color:var(--teal-2); }
+    .nl-form button { background:var(--teal); color:white; border:none; padding:11px 20px; border-radius:6px; font-family:var(--f-body); font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap; transition:background .2s; }
+    .nl-form button:hover { background:#077068; }
+    .nl-note { font-size:12.5px; color:var(--on-dark2); margin-top:10px; }
+
+    /* FOOTER */
+    .footer-wordmark {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 18px;
+    }
+    .fw-brand {
+        font-family: var(--f-head);
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: white;
+        line-height: 1;
+    }
+    .fw-brand span {
+        color: var(--teal-2);
+    }
+    .fw-sub {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.45);
+    }
+    footer { background:var(--dark); padding:32px 0; border-top:1px solid rgba(255,255,255,.06); }
+    .footer-bar { display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:var(--on-dark2); flex-wrap:wrap; gap:10px; }
+    .footer-links { display:flex; gap:24px; }
+    .footer-links a { color:rgba(255,255,255,.6); text-decoration:none; transition:color .2s; }
+    .footer-links a:hover { color:var(--teal-2); }
+
+    /* RESPONSIVE */
+    @media (max-width:1024px) {
+        .nl-box { grid-template-columns:1fr; gap:28px; padding:36px; }
+    }
+    @media (max-width:768px) {
+        .nav-links,.nav-btn,.nav-sep { display:none; }
+        .nav-mob { display:flex; align-items:center; justify-content:center; }
+        .nav-inner,.wrap,.filter-inner { padding-left:24px; padding-right:24px; }
+        .ph { padding-top:96px; }
+        .ph-inner h1 { font-size:30px; }
+        .art-row { grid-template-columns:40px 1fr 36px; }
+        .nl-box { padding:28px 24px; }
+        .nl-form { flex-direction:column; }
+        .footer-links { flex-wrap:wrap; gap:14px; }
+    }
+    </style>
+</head>
+<body>
+
+<div class="drawer" id="drawer">
+    <a href="index.html" onclick="closeDrawer()">Home</a>
+    <a href="index.html#services" onclick="closeDrawer()">Services</a>
+    <a href="index.html#fhir" onclick="closeDrawer()">FHIR Platform</a>
+    <a href="index.html#about" onclick="closeDrawer()">About</a>
+    <a href="index.html#contact" class="drawer-cta" onclick="closeDrawer()">Get in Touch</a>
+</div>
+
+<nav class="nav" id="nav">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">
+            <img src="images/akhester_logo.png" alt="Akhester Technologies" class="logo-img">
+        </a>
+        <div class="nav-sep"></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#services">Services</a></li>
+            <li><a href="index.html#fhir">FHIR Platform</a></li>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="blog.html" class="cur">Blog</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+        <a href="index.html#contact" class="nav-btn">Get in Touch</a>
+        <button class="nav-mob" onclick="toggleDrawer()" aria-label="Menu">
+            <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+                <rect y="0" width="22" height="2" rx="1" fill="#0F1C2E"/>
+                <rect y="7" width="16" height="2" rx="1" fill="#0F1C2E"/>
+                <rect y="14" width="22" height="2" rx="1" fill="#0F1C2E"/>
+            </svg>
+        </button>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<div class="ph">
+    <div class="wrap ph-inner">
+        <div class="eyebrow">Engineering Insights</div>
+        <h1>FHIR &amp; Healthcare<br>Interoperability</h1>
+        <p>Deep dives into HL7 FHIR, Smart on FHIR development, EHR integration, and healthcare data exchange from the Akhester engineering team.</p>
+    </div>
+</div>
+
+<!-- Filter -->
+<div class="filter-wrap">
+    <div class="filter-inner">
+        <div class="filter-tabs">
+            <button class="ftab on" onclick="filter(this,'all')">All</button>
+            <button class="ftab" onclick="filter(this,'fhir')">FHIR</button>
+            <button class="ftab" onclick="filter(this,'ehr')">EHR Integration</button>
+            <button class="ftab" onclick="filter(this,'cloud')">Cloud &amp; DevOps</button>
+            <button class="ftab" onclick="filter(this,'compliance')">Compliance</button>
+            <button class="ftab" onclick="filter(this,'oss')">Open Source</button>
+        </div>
+        <span class="f-count" id="fCount">7 articles</span>
+    </div>
+</div>
+
+<!-- Articles -->
+<section class="articles">
+    <div class="wrap" id="artList">
+
+        <a href="blog-fhir-r4-guide.html" class="art-row" data-cat="fhir">
+            <div class="art-num">01</div>
+            <div class="art-main">
+                <div class="art-row-meta">
+                    <span class="art-row-cat cat-fhir">FHIR</span>
+                    <span class="art-row-date">May 2025</span>
+                    <span class="art-row-dot"></span>
+                    <span class="art-row-read">8 min read</span>
+                </div>
+                <h3>Getting Started with FHIR R4: A Developer's Practical Guide</h3>
+                <p>A step-by-step walkthrough of building your first FHIR R4 API — resource modelling, search parameters, RESTful operations, and conformance validation with HAPI FHIR.</p>
+            </div>
+            <div class="art-row-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </a>
+
+        <a href="blog-smart-epic.html" class="art-row" data-cat="ehr">
+            <div class="art-num">02</div>
+            <div class="art-main">
+                <div class="art-row-meta">
+                    <span class="art-row-cat cat-ehr">EHR Integration</span>
+                    <span class="art-row-date">April 2025</span>
+                    <span class="art-row-dot"></span>
+                    <span class="art-row-read">6 min read</span>
+                </div>
+                <h3>Smart on FHIR App Launch: From Sandbox to Epic Production</h3>
+                <p>Lessons learned taking a SMART-launch application through Epic App Orchard review and into a live health system deployment at scale.</p>
+            </div>
+            <div class="art-row-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </a>
+
+        <a href="blog-hipaa-aws.html" class="art-row" data-cat="cloud">
+            <div class="art-num">03</div>
+            <div class="art-main">
+                <div class="art-row-meta">
+                    <span class="art-row-cat cat-cloud">Cloud &amp; DevOps</span>
+                    <span class="art-row-date">March 2025</span>
+                    <span class="art-row-dot"></span>
+                    <span class="art-row-read">7 min read</span>
+                </div>
+                <h3>HIPAA-Compliant FHIR on AWS: Architecture Patterns</h3>
+                <p>Design patterns for running a FHIR server on AWS with full HIPAA compliance — HealthLake, KMS encryption, CloudTrail, and VPC controls.</p>
+            </div>
+            <div class="art-row-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </a>
+
+        <a href="blog-cds-hooks.html" class="art-row" data-cat="fhir">
+            <div class="art-num">04</div>
+            <div class="art-main">
+                <div class="art-row-meta">
+                    <span class="art-row-cat cat-fhir">FHIR</span>
+                    <span class="art-row-date">Feb 2025</span>
+                    <span class="art-row-dot"></span>
+                    <span class="art-row-read">9 min read</span>
+                </div>
+                <h3>CDS Hooks in Practice: Building Real-Time Clinical Alerts</h3>
+                <p>Step-by-step guide to implementing CDS Hooks services that fire at order entry and deliver context-aware guidance inside Epic and Cerner workflows.</p>
+            </div>
+            <div class="art-row-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </a>
+
+        <a href="blog-onc-hti1.html" class="art-row" data-cat="compliance">
+            <div class="art-num">05</div>
+            <div class="art-main">
+                <div class="art-row-meta">
+                    <span class="art-row-cat cat-compliance">Compliance</span>
+                    <span class="art-row-date">Jan 2025</span>
+                    <span class="art-row-dot"></span>
+                    <span class="art-row-read">5 min read</span>
+                </div>
+                <h3>ONC HTI-1 Rule: What Healthcare Developers Must Know</h3>
+                <p>A plain-English breakdown of the ONC HTI-1 Final Rule — what changed for TEFCA, FHIR mandates, and how to prepare your health IT products.</p>
+            </div>
+            <div class="art-row-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </a>
+
+        <a href="https://ajfhir.org/" target="_blank" class="art-row" data-cat="oss">
+            <div class="art-num">06</div>
+            <div class="art-main">
+                <div class="art-row-meta">
+                    <span class="art-row-cat cat-oss">Open Source</span>
+                    <span class="art-row-date">Dec 2024</span>
+                    <span class="art-row-dot"></span>
+                    <span class="art-row-read">4 min read</span>
+                </div>
+                <h3>Introducing AJFHIR.org: Our Open-Source FHIR Initiative</h3>
+                <p>Why we open-sourced our core FHIR tooling and what it means for the interoperability community. Visit ajfhir.org to explore the platform.</p>
+            </div>
+            <div class="art-row-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </a>
+
+        <a href="blog-cda-to-fhir.html" class="art-row" data-cat="ehr">
+            <div class="art-num">07</div>
+            <div class="art-main">
+                <div class="art-row-meta">
+                    <span class="art-row-cat cat-ehr">EHR Integration</span>
+                    <span class="art-row-date">Nov 2024</span>
+                    <span class="art-row-dot"></span>
+                    <span class="art-row-read">6 min read</span>
+                </div>
+                <h3>Mapping CDA Documents to FHIR: Common Pitfalls &amp; Solutions</h3>
+                <p>Practical patterns for transforming C-CDA clinical documents to FHIR R4 resources — handling extensions, code systems, and data quality edge cases.</p>
+            </div>
+            <div class="art-row-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </a>
+
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="nl">
+    <div class="wrap">
+        <div class="nl-box">
+            <div>
+                <div class="eyebrow" style="color:rgba(255,255,255,.4);margin-bottom:14px;"><span style="display:inline-flex;align-items:center;gap:8px;"><span style="width:18px;height:2px;background:rgba(255,255,255,.25);display:block"></span>Newsletter</span></div>
+                <div class="nl-h">Stay Updated on FHIR</div>
+                <p class="nl-p">New articles on healthcare interoperability, FHIR engineering, and platform updates. No spam — unsubscribe any time.</p>
+            </div>
+            <div>
+                <div class="nl-form">
+                    <input type="email" placeholder="you@organization.com" id="nlEmail">
+                    <button onclick="subscribe()">Subscribe</button>
+                </div>
+                <div class="nl-note" id="nlNote">Join engineers and clinical informatics teams from across the healthcare industry.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="wrap">
+        <div class="footer-bar">
+            <span>© 2025 Akhester Technologies LLP · Gurugram, India</span>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="https://ajfhir.org/" target="_blank">AJFHIR.org</a>
+                <a href="https://ajfhir.com/" target="_blank">AJFHIR.com</a>
+                <a href="index.html#contact">Contact</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 40), { passive:true });
+
+    function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); }
+    function closeDrawer()  { document.getElementById('drawer').classList.remove('open'); }
+
+    const rows = document.querySelectorAll('.art-row[data-cat]');
+    const countEl = document.getElementById('fCount');
+
+    function filter(btn, cat) {
+        document.querySelectorAll('.ftab').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        let n = 0, i = 0;
+        rows.forEach(r => {
+            const show = cat === 'all' || r.dataset.cat === cat;
+            r.style.display = show ? 'grid' : 'none';
+            if (show) { i++; r.querySelector('.art-num').textContent = String(i).padStart(2,'0'); n++; }
+        });
+        countEl.textContent = n + (n === 1 ? ' article' : ' articles');
+    }
+
+    function subscribe() {
+        const v = document.getElementById('nlEmail').value;
+        const n = document.getElementById('nlNote');
+        if (!v || !v.includes('@')) { n.textContent = 'Please enter a valid email.'; n.style.color='#F87171'; return; }
+        n.textContent = '✓ Subscribed. Welcome to the community!';
+        n.style.color = '#4ADE80';
+        document.getElementById('nlEmail').value = '';
+    }
+</script>
+</body>
+</html>
