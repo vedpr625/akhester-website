@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akhester Technologies — Healthcare Interoperability & FHIR Solutions</title>
-    <meta name="description" content="Akhester Technologies delivers FHIR-based healthcare interoperability — open-source platform and enterprise Smart on FHIR products.">
+    <title>Akhester Technologies — FHIR Health Data Platform</title>
+    <meta name="description" content="Akhester Technologies delivers FHIR-based healthcare interoperability — AJ FHIR open source platform and Jam commercial products for hospitals and national health systems.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -292,34 +292,52 @@
     ════════════════════════════════════════════ */
     .platforms {
         background: var(--dark);
-        padding: 52px 0;
+        padding: 56px 0;
     }
     .platforms-inner {
         max-width: var(--w); margin:0 auto; padding:0 48px;
-        display: grid; grid-template-columns:1fr 1px 1fr; gap:0; align-items:stretch;
+        display: grid; grid-template-columns: repeat(4,1fr);
+        gap: 1px; background: rgba(255,255,255,0.07);
+        border-radius: 16px; overflow: hidden;
     }
-    .plat-rule { background: rgba(255,255,255,0.08); }
+    .plat-rule { display: none; }
     .plat-card {
-        padding: 40px 52px;
-        text-decoration:none;
-        display:flex; flex-direction:column; gap:14px;
-        transition: background .25s;
+        padding: 28px 26px 32px;
+        background: var(--dark);
+        text-decoration: none;
+        display: flex; flex-direction: column; gap: 10px;
+        transition: background .2s;
+        position: relative;
     }
-    .plat-card:hover { background: rgba(255,255,255,0.04); }
-    .plat-type {
-        font-size: 11px; font-weight: 700; letter-spacing:1.5px;
-        text-transform:uppercase;
+    .plat-card:hover { background: rgba(255,255,255,0.035); }
+    .plat-card:hover .plat-link { gap: 8px; }
+    /* Badge pill */
+    .plat-badge {
+        display: inline-flex; align-items: center;
+        font-size: 10px; font-weight: 700; letter-spacing: .8px;
+        text-transform: uppercase; white-space: nowrap;
+        padding: 3px 10px; border-radius: 20px;
+        align-self: flex-start; margin-bottom: 4px;
     }
-    .plat-type.oss  { color: #4ADE80; }
-    .plat-type.comm { color: #60CDFF; }
+    .plat-badge.oss  { background: rgba(74,222,128,.12);  color: #4ADE80; border: 1px solid rgba(74,222,128,.22); }
+    .plat-badge.comm { background: rgba(96,205,255,.12);  color: #60CDFF; border: 1px solid rgba(96,205,255,.22); }
+    .plat-badge.saas { background: rgba(167,139,250,.12); color: #A78BFA; border: 1px solid rgba(167,139,250,.22); }
     .plat-card h3 {
         font-family: var(--f-head);
-        font-size: 28px; font-weight: 700;
-        color: white; letter-spacing: -.4px;
+        font-size: 20px; font-weight: 700;
+        color: white; letter-spacing: -.25px; line-height: 1.2;
+        margin: 0;
     }
-    .plat-card p  { font-size:15px; color:var(--on-dark); line-height:1.75; max-width:380px; }
-    .plat-link    { font-size:14px; font-weight:600; color: var(--teal-2); display:flex; align-items:center; gap:6px; margin-top:4px; }
-    .plat-link::after { content:'↗'; font-size:12px; }
+    .plat-card p {
+        font-size: 13.5px; color: var(--on-dark-2);
+        line-height: 1.68; flex: 1; margin: 0;
+    }
+    .plat-link {
+        font-size: 12.5px; font-weight: 600; color: var(--teal-2);
+        display: inline-flex; align-items: center; gap: 5px;
+        margin-top: 6px; transition: gap .15s;
+    }
+    .plat-link::after { content: '↗'; font-size: 10px; }
 
     /* ════════════════════════════════════════════
        SERVICES
@@ -446,17 +464,20 @@
     }
     .offering-card > p { font-size:15px; color:var(--ink-3); line-height:1.75; margin-bottom:28px; }
 
-    .offering-list { display:flex; flex-direction:column; gap:9px; margin-bottom:32px; }
+    .offering-list { display:flex; flex-direction:column; gap:8px; margin-bottom:32px; }
     .offering-li {
-        display:flex; align-items:flex-start; gap:10px;
-        font-size:14px; font-weight:500; color:var(--ink-2); line-height:1.5;
+        display:flex; align-items:flex-start; gap:9px;
+        font-size:13.5px; font-weight:500; color:var(--ink-2); line-height:1.55;
     }
     .offering-li::before {
-        content:''; display:block; width:16px; height:16px;
-        border-radius:50%; flex-shrink:0; margin-top:1px;
+        content:'✓';
+        display:flex; align-items:center; justify-content:center;
+        width:17px; height:17px; border-radius:50%;
+        font-size:9px; font-weight:800;
+        flex-shrink:0; margin-top:1px;
     }
-    .offering-card.oss  .offering-li::before { background:#0A7A6E; }
-    .offering-card.comm .offering-li::before { background:#1A3D6E; }
+    .offering-card.oss  .offering-li::before { background:#D8F0EC; color:#0A7A6E; }
+    .offering-card.comm .offering-li::before { background:#DDE8F8; color:#1A3D6E; }
 
     .btn-teal {
         background:var(--teal); color:white;
@@ -710,7 +731,7 @@
         .svc-grid { grid-template-columns:repeat(2,1fr); }
         .stats-grid { grid-template-columns:repeat(2,1fr); gap:40px; }
         .stat-cell { border:none; padding:0; }
-        .platforms-inner { grid-template-columns:1fr; }
+        .platforms-inner { grid-template-columns:1fr 1fr; border-radius:12px; }
         .plat-rule { display:none; }
         .plat-card { padding:32px; }
         .blog-grid { grid-template-columns:1fr; }
@@ -781,8 +802,8 @@
             <h1>Healthcare<br>Interoperability<br>on <mark>Open Standards</mark></h1>
             <p class="hero-p">Akhester Technologies builds FHIR-based interoperability infrastructure — from open-source tooling to enterprise Smart on FHIR products — helping care organisations exchange data with confidence.</p>
             <div class="hero-actions">
-                <a href="https://ajfhir.com/" target="_blank" class="btn-dark">Smart on FHIR Platform</a>
-                <a href="https://ajfhir.org/" target="_blank" class="btn-ghost">Open Source ↗</a>
+                <a href="https://platform.akhester.com/" target="_blank" class="btn-dark">Jam Platform</a>
+                <a href="https://open.akhester.com/" target="_blank" class="btn-ghost">AJ FHIR Open Source ↗</a>
             </div>
             <div class="hero-compliance">
                 <span class="compliance-label">Compliance</span>
@@ -900,18 +921,29 @@
 <!-- ── PLATFORMS ── -->
 <section class="platforms" id="fhir">
     <div class="platforms-inner">
-        <a href="https://ajfhir.org/" target="_blank" class="plat-card">
-            <div class="plat-type oss">Open Source Initiative</div>
-            <h3>AJFHIR.org</h3>
-            <p>Community-driven FHIR libraries, reference implementations, and developer tooling. Free to use, fork, and contribute.</p>
-            <div class="plat-link">Explore ajfhir.org</div>
+        <a href="https://open.akhester.com/" target="_blank" class="plat-card">
+            <span class="plat-badge oss">Open Source</span>
+            <h3>AJ FHIR Platform</h3>
+            <p>SMART auth, consent, immunisation, referral, MPI, and facility registry. 9 Apache 2.0 components, 500+ tests.</p>
+            <span class="plat-link">open.akhester.com</span>
         </a>
-        <div class="plat-rule"></div>
-        <a href="https://ajfhir.com/" target="_blank" class="plat-card">
-            <div class="plat-type comm">Commercial Platform</div>
-            <h3>AJFHIR.com</h3>
-            <p>Production-grade Smart on FHIR platform — EHR connectors, OAuth 2.0, CDS Hooks, managed cloud hosting, and enterprise SLA.</p>
-            <div class="plat-link">Explore ajfhir.com</div>
+        <a href="https://platform.akhester.com/" target="_blank" class="plat-card">
+            <span class="plat-badge comm">Commercial HIE</span>
+            <h3>Jam Platform</h3>
+            <p>JamBridge, JamConnect, JamSHR, JamGuard, JamCare — HL7v2 integration, MPI, shared health record, and clinical intelligence.</p>
+            <span class="plat-link">platform.akhester.com</span>
+        </a>
+        <a href="https://emr.akhester.com/" target="_blank" class="plat-card">
+            <span class="plat-badge comm">FHIR EMR</span>
+            <h3>JamEMR</h3>
+            <p>Full FHIR-native EMR. Consent, referral, immunisation, and shared health record built in — not added later.</p>
+            <span class="plat-link">emr.akhester.com</span>
+        </a>
+        <a href="https://cloud.akhester.com/" target="_blank" class="plat-card">
+            <span class="plat-badge saas">Managed SaaS</span>
+            <h3>JamCloud</h3>
+            <p>Fully managed multi-tenant HIE. All Jam products, hosted by us. Connect your HIS and go live — no infrastructure to run.</p>
+            <span class="plat-link">cloud.akhester.com</span>
         </a>
     </div>
 </section>
@@ -1055,7 +1087,7 @@
                         <text x="156" y="63" text-anchor="middle" font-family="Arial" font-size="7.5"
                               font-weight="700" fill="#60CDFF">Test</text>
                         <text x="156" y="74" text-anchor="middle" font-family="Arial" font-size="6"
-                              fill="rgba(255,255,255,0.4)">206 tests</text>
+                              fill="rgba(255,255,255,0.4)">500+ tests</text>
 
                         <!-- Arrow 2→3 -->
                         <line x1="188" y1="66" x2="202" y2="66" stroke="rgba(96,205,255,0.4)" stroke-width="1.5"/>
@@ -1173,9 +1205,11 @@
 
                             <!-- Item 5 -->
                             <rect x="260" y="216" width="14" height="14" rx="3"
-                                  fill="#1A3D6E" stroke="rgba(96,205,255,0.3)" stroke-width="1"/>
+                                  fill="#0A7A6E" stroke="none"/>
+                            <path d="M263,223 L266,226 L272,220" stroke="white" stroke-width="1.5"
+                                  stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                             <text x="280" y="227" font-family="Arial" font-size="8.5" font-weight="600"
-                                  fill="rgba(255,255,255,0.40)">TEFCA / QHINs</text>
+                                  fill="rgba(255,255,255,0.80)">IHE ATNA / MHD</text>
                             <!-- animated checkmark drawing in -->
                             <path d="M263,223 L266,226 L272,220" stroke="rgba(255,255,255,0.0)"
                                   stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
@@ -1199,7 +1233,7 @@
                         <circle cx="44" cy="296" r="4" fill="#0A7A6E"/>
                         <line x1="44" y1="300" x2="44" y2="310" stroke="rgba(14,155,140,0.25)" stroke-width="1"/>
                         <text x="54" y="299" font-family="Arial" font-size="8" font-weight="600"
-                              fill="rgba(255,255,255,0.75)">feat: add PKCE S256 enforcement to auth server</text>
+                              fill="rgba(255,255,255,0.75)">feat: JamBridge ADT/ORU MLLP to FHIR R4 pipeline</text>
                         <text x="390" y="299" font-family="Arial" font-size="7"
                               fill="rgba(255,255,255,0.28)">2m ago</text>
 
@@ -1207,14 +1241,14 @@
                         <circle cx="44" cy="312" r="4" fill="#1A3D6E"/>
                         <line x1="44" y1="316" x2="44" y2="326" stroke="rgba(26,61,110,0.25)" stroke-width="1"/>
                         <text x="54" y="315" font-family="Arial" font-size="8" font-weight="600"
-                              fill="rgba(255,255,255,0.55)">fix: consent gate fail-closed on timeout</text>
+                              fill="rgba(255,255,255,0.55)">fix: AJ MPI golden record merge edge case</text>
                         <text x="390" y="315" font-family="Arial" font-size="7"
                               fill="rgba(255,255,255,0.22)">18m ago</text>
 
                         <!-- Row 3 -->
                         <circle cx="44" cy="328" r="4" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
                         <text x="54" y="331" font-family="Arial" font-size="8"
-                              fill="rgba(255,255,255,0.35)">chore: bump HAPI FHIR 7.4.0 → 7.6.0</text>
+                              fill="rgba(255,255,255,0.35)">feat: JamSHR IPS summary endpoint live</text>
                         <text x="390" y="331" font-family="Arial" font-size="7"
                               fill="rgba(255,255,255,0.18)">1h ago</text>
 
@@ -1239,16 +1273,16 @@
     <div class="wrap">
         <div class="stats-grid">
             <div class="stat-cell">
-                <div class="stat-n">50<em>+</em></div>
-                <div class="stat-l">FHIR Integrations Shipped</div>
+                <div class="stat-n">14<em>+</em></div>
+                <div class="stat-l">Platform Products</div>
             </div>
             <div class="stat-cell">
                 <div class="stat-n">R4<em>/R5</em></div>
                 <div class="stat-l">FHIR Standard Compliance</div>
             </div>
             <div class="stat-cell">
-                <div class="stat-n">10<em>+</em></div>
-                <div class="stat-l">EHR Systems Supported</div>
+                <div class="stat-n">500<em>+</em></div>
+                <div class="stat-l">Automated Tests</div>
             </div>
             <div class="stat-cell">
                 <div class="stat-n">100<em>%</em></div>
@@ -1264,34 +1298,61 @@
         <div class="offerings-head">
             <div class="eyebrow">Our Platforms</div>
             <h2 class="section-h">Open Source &amp; Commercial</h2>
-            <p class="section-lead">Dual-track innovation — contributing to the FHIR community while delivering enterprise-grade commercial solutions.</p>
+            <p class="section-lead">Open source foundation, commercial platform on top — from a free SMART on FHIR toolkit to a fully managed national HIE.</p>
         </div>
         <div class="offerings-grid">
             <div class="offering-card oss">
-                <div class="offering-type">Open Source — AJFHIR.org</div>
-                <h3>Community FHIR Platform</h3>
-                <p>Free FHIR libraries, implementation guides, and developer tools. Contribute, fork, and build on solid open-source foundations.</p>
+                <div class="offering-type">Open Source — Apache 2.0</div>
+                <h3>AJ FHIR Platform</h3>
+                <p>Nine independently deployable components — SMART auth, consent management, immunisation, referral, master patient index, and facility registry. Free to use, deploy, and modify.</p>
                 <div class="offering-list">
-                    <div class="offering-li">FHIR R4/R5 Client Libraries</div>
-                    <div class="offering-li">Reference Server Implementation</div>
-                    <div class="offering-li">Terminology Services</div>
-                    <div class="offering-li">CDA to FHIR Conversion</div>
-                    <div class="offering-li">Community Documentation</div>
+                    <div class="offering-li">AJ FHIR Auth Server v0.2.3 — 90 tests</div>
+                    <div class="offering-li">AJ FHIR Consent Manager v1.0.0 — 181 tests</div>
+                    <div class="offering-li">AJ FHIR SMART Client v0.1.0 — 206 tests</div>
+                    <div class="offering-li">AJ MPI — Master Patient Index</div>
+                    <div class="offering-li">AJ FR — Facility Registry (mCSD)</div>
+                    <div class="offering-li">AJ FHIR Immunisation App + Referral Module</div>
                 </div>
-                <a href="https://ajfhir.org/" target="_blank" class="btn-teal">Visit AJFHIR.org ↗</a>
+                <a href="https://open.akhester.com/" target="_blank" class="btn-teal">Visit open.akhester.com ↗</a>
             </div>
             <div class="offering-card comm">
-                <div class="offering-type">Commercial — AJFHIR.com</div>
-                <h3>Enterprise Smart on FHIR</h3>
-                <p>Production-grade platform with managed hosting, EHR marketplace listings, SSO, audit logging, and dedicated support.</p>
+                <div class="offering-type">Commercial HIE — platform.akhester.com</div>
+                <h3>Jam Platform</h3>
+                <p>Commercial products built on the AJ FHIR foundation — HL7v2 integration, clinical coordination, shared health record, analytics, and clinical intelligence.</p>
                 <div class="offering-list">
-                    <div class="offering-li">Smart on FHIR App Launch</div>
-                    <div class="offering-li">Epic, Cerner &amp; Oracle Connectors</div>
-                    <div class="offering-li">CDS Hooks Integration</div>
-                    <div class="offering-li">HIPAA-Compliant Cloud Hosting</div>
-                    <div class="offering-li">Enterprise SLA &amp; Support</div>
+                    <div class="offering-li">JamBridge — HL7v2 to FHIR gateway, 7 message types</div>
+                    <div class="offering-li">JamConnect — Clinical coordination facade</div>
+                    <div class="offering-li">JamSHR / JamPHR — Shared Health Record</div>
+                    <div class="offering-li">JamDHIW / JamTS — Analytics &amp; Terminology</div>
+                    <div class="offering-li">JamGuard / JamCare — Clinical intelligence</div>
                 </div>
-                <a href="https://ajfhir.com/" target="_blank" class="btn-blue">Visit AJFHIR.com ↗</a>
+                <a href="https://platform.akhester.com/" target="_blank" class="btn-blue">Visit platform.akhester.com ↗</a>
+            </div>
+            <div class="offering-card comm">
+                <div class="offering-type">FHIR-Native EMR — emr.akhester.com</div>
+                <h3>JamEMR</h3>
+                <p>A full electronic medical record built natively on the Jam platform. Consent, referral, immunisation, shared health record, and terminology — all built in from day one, not bolted on later.</p>
+                <div class="offering-list">
+                    <div class="offering-li">Built on FHIR R4/R5 throughout</div>
+                    <div class="offering-li">Consent &amp; patient portal included</div>
+                    <div class="offering-li">Cross-facility referral workflow</div>
+                    <div class="offering-li">IPS patient summaries via JamSHR</div>
+                    <div class="offering-li">Site or enterprise licence</div>
+                </div>
+                <a href="https://emr.akhester.com/" target="_blank" class="btn-blue">Visit emr.akhester.com ↗</a>
+            </div>
+            <div class="offering-card comm">
+                <div class="offering-type">Managed SaaS — cloud.akhester.com</div>
+                <h3>JamCloud</h3>
+                <p>The full Jam platform as a managed service. Connect your HIS to JamBridge MLLP endpoints hosted by us. Analytics, shared health record, patient portal, and clinical intelligence — no infrastructure to run.</p>
+                <div class="offering-list">
+                    <div class="offering-li">Fully managed, multi-tenant HIE</div>
+                    <div class="offering-li">All Jam products included</div>
+                    <div class="offering-li">No DevOps team required</div>
+                    <div class="offering-li">Per-facility SaaS subscription</div>
+                    <div class="offering-li">SLA guaranteed</div>
+                </div>
+                <a href="https://cloud.akhester.com/" target="_blank" class="btn-blue">Visit cloud.akhester.com ↗</a>
             </div>
         </div>
     </div>
@@ -1437,7 +1498,7 @@
                         <div class="c-icon">🌐</div>
                         <div>
                             <div class="c-label">FHIR Platforms</div>
-                            <div class="c-val"><a href="https://ajfhir.org/" target="_blank">ajfhir.org</a> &nbsp;·&nbsp; <a href="https://ajfhir.com/" target="_blank">ajfhir.com</a></div>
+                            <div class="c-val"><a href="https://open.akhester.com/" target="_blank">open.akhester.com</a> &nbsp;·&nbsp; <a href="https://platform.akhester.com/" target="_blank">platform.akhester.com</a></div>
                         </div>
                     </div>
                 </div>
@@ -1454,8 +1515,8 @@
                         <select>
                             <option value="">Select a topic</option>
                             <option>FHIR Integration Services</option>
-                            <option>Smart on FHIR Platform (AJFHIR.com)</option>
-                            <option>Open Source FHIR (AJFHIR.org)</option>
+                            <option>Jam Platform (platform.akhester.com)</option>
+                            <option>AJ FHIR Open Source (open.akhester.com)</option>
                             <option>Product Engineering</option>
                             <option>Cloud &amp; DevOps</option>
                             <option>Compliance Consulting</option>
@@ -1499,8 +1560,10 @@
             <div class="footer-col">
                 <h4>Platforms</h4>
                 <ul>
-                    <li><a href="https://ajfhir.org/" target="_blank">AJFHIR.org — Open Source</a></li>
-                    <li><a href="https://ajfhir.com/" target="_blank">AJFHIR.com — Commercial</a></li>
+                    <li><a href="https://open.akhester.com/" target="_blank">open.akhester.com — AJ FHIR</a></li>
+                    <li><a href="https://platform.akhester.com/" target="_blank">platform.akhester.com — Jam</a></li>
+                    <li><a href="https://emr.akhester.com/" target="_blank">emr.akhester.com — JamEMR</a></li>
+                    <li><a href="https://cloud.akhester.com/" target="_blank">cloud.akhester.com — JamCloud</a></li>
                     <li><a href="blog.html">Blog</a></li>
                     <li><a href="#about">About</a></li>
                     <li><a href="#contact">Contact</a></li>
@@ -1517,8 +1580,8 @@
             </div>
         </div>
         <div class="footer-bar">
-            <span>© 2025 Akhester Technologies LLP · Gurugram, India</span>
-            <span>FHIR® is a registered trademark of HL7 &nbsp;·&nbsp; <a href="https://ajfhir.org/" target="_blank">ajfhir.org</a> &nbsp;·&nbsp; <a href="https://ajfhir.com/" target="_blank">ajfhir.com</a></span>
+            <span>© 2026 Akhester Technologies LLP · Gurugram, India</span>
+            <span>FHIR® is a registered trademark of HL7 &nbsp;·&nbsp; <a href="https://open.akhester.com/" target="_blank">open.akhester.com</a> &nbsp;·&nbsp; <a href="https://platform.akhester.com/" target="_blank">platform.akhester.com</a></span>
         </div>
     </div>
 </footer>
